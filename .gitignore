@@ -1,0 +1,5 @@
+# ignore inventory
+inventory
+
+# ignore custom install vars
+vars/install.local.yml

@@ -1,0 +1,13 @@
+{% for item in ['all', 'compute', 'master', 'infra'] %}
+{%   if item in groups %}
+[{{item}}]
+{%     for entry in groups[item] %}
+{%       if entry == "master-000000" %}
+{{ entry }} ansible_host="{{master0_ip.stdout|trim}}" ansible_user="cloud-user"
+{%       elif entry != 'localhost' %}
+{{ entry }} ansible_ssh_common_args="{{hostvars[entry]['ansible_ssh_common_args']|default("")}}" ansible_user="cloud-user"
+{%       endif %}
+{%     endfor %}
+
+{%   endif %}
+{% endfor %}

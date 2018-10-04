@@ -1,0 +1,58 @@
+---
+#
+# Get core cluster in order to build an inventory file
+#
+
+- name: Get master-000000 ip address
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars_files:
+    - vars/inventory.yml
+  tasks:
+    - name: Get master-000000 ip address
+      shell: |
+        az vmss list-instance-public-ips -g {{rg}} -n ss-master --query "[0].ipAddress" | tr -d '"'
+      register: master0_ip
+
+    - name: Add master-000000
+      add_host:
+        hostname: "master-000000"
+        ansible_host: "{{master0_ip.stdout|trim}}"
+        groups: ["master"]
+        ansible_user: cloud-user
+
+- name: Get entire cluster, proxied through master
+  hosts: master
+  gather_facts: false
+  vars_files:
+    - vars/inventory.yml
+  tasks:
+    - name: Get list of hosts
+      become: true
+      shell: |
+        oc get nodes | grep -v "NAME" | awk '{print $1}'
+      register: nodes
+
+    - name: Add machines
+      add_host:
+        hostname: "{{item|trim}}"
+        groups:
+          - "{{item.split('-')[0]}}"
+        ansible_user: cloud-user
+        ansible_ssh_common_args: |-
+          -o ProxyCommand='ssh -i {{ansible_private_key_file}} -W %h:%p cloud-user@{{ansible_host}}'
+      with_items: "{{nodes.stdout_lines}}"
+      when: item|trim != "master-000000"
+
+- name: Create Inventory file
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars_files:
+    - vars/inventory.yml
+  tasks:
+    - name: Dump inventory file
+      template:
+        src: templates/inventory.j2
+        dest: inventory

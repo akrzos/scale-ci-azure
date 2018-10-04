@@ -1,0 +1,3 @@
+---
+# Vars for generating inventory
+ansible_private_key_file: ~/go/src/github.com/openshift/openshift-azure/_data/_out/id_rsa

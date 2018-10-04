@@ -1,0 +1,89 @@
+---
+#
+# Installs tooling for scale-ci pipeline tests on an OSA cluster
+#
+
+- name: Install and Setup cluster
+  hosts: master, infra, compute
+  gather_facts: false
+  vars_files:
+    - vars/install.yml
+    - vars/install.local.yml
+  tasks:
+    - name: Add repo files
+      become: true
+      copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        mode: "{{item.mode}}"
+      with_items: "{{repo_files}}"
+
+    - name: Install EPEL
+      become: true
+      yum:
+        name: "{{epel_rpm}}"
+        state: latest
+
+    - name: Install performance tools packages
+      become: true
+      yum:
+        name: "{{perf_packages}}"
+        state: latest
+
+    - name: Ensure .ssh directory exists for root
+      become: true
+      file:
+        path: /root/.ssh
+        state: directory
+
+    - name: Configure ssh keys
+      become: true
+      copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        mode: "{{item.mode}}"
+      with_items:
+        - src: "{{ssh_key_private}}"
+          dest: /root/.ssh/id_rsa
+          mode: "0600"
+        - src: "{{ssh_key_public}}"
+          dest: /root/.ssh/id_rsa.pub
+          mode: "0600"
+
+    - name: Configure ssh access
+      become: true
+      lineinfile:
+        path: "{{item}}"
+        line: "{{public_key_contents}}"
+        create: true
+      with_items:
+        - /home/cloud-user/.ssh/authorized_keys
+        - /root/.ssh/authorized_keys
+
+    - name: Configure pbench
+      become: true
+      copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        mode: "{{item.mode}}"
+      with_items: "{{pbench_files}}"
+
+- name: pbench register tools
+  hosts: master
+  gather_facts: false
+  vars_files:
+    - vars/install.yml
+    - vars/install.local.yml
+  tasks:
+    - name: Deploy register tools script
+      become: true
+      copy:
+        src: files/pbench-register.sh
+        dest: /root/pbench-register.sh
+        mode: 0744
+      when: inventory_hostname == groups['master'][0]
+
+    - name: Register remotes
+      become: true
+      shell: bash /root/pbench-register.sh
+      when: inventory_hostname == groups['master'][0]
