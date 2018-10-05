@@ -95,13 +95,28 @@
         state: reloaded
         enabled: yes
 
-- name: pbench register tools
+- name: configure masters
   hosts: master
   gather_facts: false
   vars_files:
     - vars/install.yml
     - vars/install.local.yml
   tasks:
+    - name: Remove AlwaysPullImages plugin config on masters
+      become: true
+      replace:
+        path: /etc/origin/master/master-config.yaml
+        regexp: '(\s+)AlwaysPullImages:\n(\s+)configuration:\n(\s+)kind: DefaultAdmissionConfig\n(\s+)apiVersion: v1\n(\s+)disable: false'
+        replace: ""
+        backup: true
+
+    - name: Restart docker
+      become: true
+      service:
+        name: docker
+        state: restarted
+        enabled: yes
+
     - name: Deploy register tools script
       become: true
       copy:

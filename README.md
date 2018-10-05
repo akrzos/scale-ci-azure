@@ -14,6 +14,7 @@ Playbooks/tasks to setup scale-ci tests on OpenShift Azure
 [user@fedora scale-ci-azure]$ vi vars/install.local.yml
 ```
 A copy is made of the `vars/install.yml` with the name `vars/install.local.yml` such that private information can be changed to install vars without pushing into git.
+
 3. Create inventory file:
 ```
 [user@fedora scale-ci-azure]$ time ansible-playbook -i 'localhost,' inventory.yml -e 'rg=perf-test'
