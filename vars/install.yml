@@ -77,7 +77,7 @@ perf_packages:
   - libarchive
   - ostree
   - skopeo
-  -atomic-openshift-tests
+  - atomic-openshift-tests
 
 repo_files:
   - src: files/pbench.repo
