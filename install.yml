@@ -68,6 +68,33 @@
         mode: "{{item.mode}}"
       with_items: "{{pbench_files}}"
 
+    - name: clone svt repo
+      become: true
+      git:
+        repo: https://github.com/openshift/svt
+        dest: /root/svt
+        force: true
+
+    # - name: Copy ssh key for svt networking tests
+    #   become: true
+    #   shell: |
+    #     cd /root/svt/networking/synthetic
+    #     cp /root/.ssh/id_rsa.pub id_rsa.pub
+
+    - name: Allow networking tests over the firewall for Node2Node
+      become: true
+      shell: |
+        iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
+        iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited
+        iptables-save > /etc/sysconfig/iptables
+
+    - name: enable iptables service
+      become: true
+      service:
+        name: iptables
+        state: reloaded
+        enabled: yes
+
 - name: pbench register tools
   hosts: master
   gather_facts: false

@@ -16,10 +16,68 @@ pbench_files:
     mode: "0600"
 
 perf_packages:
+  - ansible
+  - bind-utils
+  - blktrace
+  - ethtool
+  - findutils
   - git
-  - jq
+  - gnuplot
+  - golang
+  - httpd-tools
+  - hwloc
+  - iotop
+  # - iptables-services
+  - kernel
+  - kernel-devel
+  - ltrace
+  - mailx
+  - maven
+  - netsniff-ng
+  - net-tools
+  - ntp
+  - ntpdate
+  - numactl
+  - pciutils
+  - perf
   - pbench-agent
   - pbench-uperf
+  - pbench-sysstat
+  - python-docker-py
+  - python-flask
+  - python-pip
+  - python-rbd
+  - python2-boto3
+  - powertop
+  - psmisc
+  - rpm-build
+  - screen
+  - sos
+  - strace
+  - tar
+  - tcpdump
+  - tmux
+  - vim-enhanced
+  - xauth
+  - wget
+  - yum-utils
+  - rpmdevtools
+  - iperf3
+  - docker
+  # - ceph-common
+  # - glusterfs-fuse
+  - iscsi-initiator-utils
+  - deltarpm
+  - jq
+  - cockpit
+  - cockpit-docker
+  - device-mapper-multipath
+  - dnsmasq
+  - haproxy
+  - libarchive
+  - ostree
+  - skopeo
+  -atomic-openshift-tests
 
 repo_files:
   - src: files/pbench.repo
