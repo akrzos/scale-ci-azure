@@ -10,26 +10,6 @@
     - vars/install.yml
     - vars/install.local.yml
   tasks:
-    - name: Add repo files
-      become: true
-      copy:
-        src: "{{item.src}}"
-        dest: "{{item.dest}}"
-        mode: "{{item.mode}}"
-      with_items: "{{repo_files}}"
-
-    - name: Install EPEL
-      become: true
-      yum:
-        name: "{{epel_rpm}}"
-        state: latest
-
-    - name: Install performance tools packages
-      become: true
-      yum:
-        name: "{{perf_packages}}"
-        state: latest
-
     - name: Ensure .ssh directory exists for root
       become: true
       file:
@@ -60,6 +40,26 @@
         - /home/cloud-user/.ssh/authorized_keys
         - /root/.ssh/authorized_keys
 
+    - name: Add repo files
+      become: true
+      copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        mode: "{{item.mode}}"
+      with_items: "{{repo_files}}"
+
+    - name: Install EPEL
+      become: true
+      yum:
+        name: "{{epel_rpm}}"
+        state: latest
+
+    - name: Install performance tools packages
+      become: true
+      yum:
+        name: "{{perf_packages}}"
+        state: latest
+
     - name: Configure pbench
       become: true
       copy:
@@ -75,11 +75,11 @@
         dest: /root/svt
         force: true
 
-    # - name: Copy ssh key for svt networking tests
-    #   become: true
-    #   shell: |
-    #     cd /root/svt/networking/synthetic
-    #     cp /root/.ssh/id_rsa.pub id_rsa.pub
+    - name: Copy ssh key for svt networking tests
+      become: true
+      shell: |
+        cd /root/svt/networking/synthetic
+        cp /root/.ssh/id_rsa.pub id_rsa.pub
 
     - name: Allow networking tests over the firewall for Node2Node
       become: true
@@ -119,8 +119,8 @@
 
     - name: Deploy register tools script
       become: true
-      copy:
-        src: files/pbench-register.sh
+      template:
+        src: templates/pbench-register.sh.j2
         dest: /root/pbench-register.sh
         mode: 0744
       when: inventory_hostname == groups['master'][0]

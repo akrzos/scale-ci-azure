@@ -1,0 +1,50 @@
+#/usr/bin/env bash
+source /opt/pbench-agent/profile
+
+default_tools_interval=10
+
+pbench-clear-tools
+
+# {{inventory_hostname}}
+pbench-register-tool --name=disk -- --interval=$default_tools_interval
+pbench-register-tool --name=haproxy-ocp -- --interval=$default_tools_interval --counters-clear-all
+pbench-register-tool --name=iostat -- --interval=$default_tools_interval
+pbench-register-tool --name=mpstat -- --interval=$default_tools_interval
+pbench-register-tool --name=oc -- --interval=$default_tools_interval
+pbench-register-tool --name=pidstat -- --interval=$default_tools_interval
+#pbench-register-tool --name=prometheus-metrics -- --inventory=$inventory_file_path
+pbench-register-tool --name=sar -- --interval=$default_tools_interval
+#pbench-register-tool --name=perf -- --interval=$default_tools_interval
+
+{% for host in groups['master'][1:] %}
+remote={{host}}
+pbench-register-tool --name=disk --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=haproxy-ocp --remote $remote -- --interval=$default_tools_interval --counters-clear-all
+pbench-register-tool --name=iostat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=mpstat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=oc --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=pidstat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=sar --remote $remote -- --interval=$default_tools_interval
+#pbench-register-tool --name=perf --remote $remote -- --interval=$default_tools_interval
+
+{% endfor %}
+{% for host in groups['infra'] %}
+remote={{host}}
+pbench-register-tool --name=disk --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=iostat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=mpstat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=pidstat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=sar --remote $remote -- --interval=$default_tools_interval
+#pbench-register-tool --name=perf --remote $remote -- --interval=$default_tools_interval
+
+{% endfor %}
+{% for host in groups['compute'][:2] %}
+remote={{host}}
+pbench-register-tool --name=disk --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=iostat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=mpstat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=pidstat --remote $remote -- --interval=$default_tools_interval
+pbench-register-tool --name=sar --remote $remote -- --interval=$default_tools_interval
+#pbench-register-tool --name=perf --remote $remote -- --interval=$default_tools_interval
+
+{% endfor %}
