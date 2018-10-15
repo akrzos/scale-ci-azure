@@ -21,5 +21,5 @@ A copy is made of the `vars/install.yml` with the name `vars/install.local.yml` 
 ```
 4. Install tooling:
 ```
-[user@fedora scale-ci-azure]$ time ansible-playbook -i inventory install.yml
+[user@fedora scale-ci-azure]$ time ansible-playbook --forks 20 -i inventory install.yml
 ```

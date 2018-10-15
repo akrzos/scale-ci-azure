@@ -22,12 +22,28 @@
         groups: ["master"]
         ansible_user: cloud-user
 
-- name: Get entire cluster, proxied through master
+- name: Get entire cluster, modify sshd config for more Ansible forks
   hosts: master
   gather_facts: false
   vars_files:
     - vars/inventory.yml
   tasks:
+    # Allows more ssh connections for more ansible forks
+    - name: Increase MaxStartups in sshd
+      become: true
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "MaxStartups.*"
+        line: "MaxStartups 100"
+        state: present
+        backup: true
+
+    - name: Reload sshd
+      become: true
+      service:
+        name: sshd
+        state: reloaded
+
     - name: Get list of hosts
       become: true
       shell: |

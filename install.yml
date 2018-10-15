@@ -68,7 +68,7 @@
         mode: "{{item.mode}}"
       with_items: "{{pbench_files}}"
 
-    - name: clone svt repo
+    - name: Clone svt repo
       become: true
       git:
         repo: https://github.com/openshift/svt
@@ -88,14 +88,14 @@
         iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited
         iptables-save > /etc/sysconfig/iptables
 
-    - name: enable iptables service
+    - name: Reload iptables service
       become: true
       service:
         name: iptables
         state: reloaded
         enabled: yes
 
-- name: configure masters
+- name: Configure masters
   hosts: master
   gather_facts: false
   vars_files:
