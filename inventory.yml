@@ -38,6 +38,15 @@
         state: present
         backup: true
 
+    - name: Turn off Host Key checking for testing
+      become: true
+      lineinfile:
+        path: /etc/ssh/ssh_config
+        regexp: "StrictHostKeyChecking.*"
+        line: "StrictHostKeyChecking no"
+        state: present
+        backup: true
+
     - name: Reload sshd
       become: true
       service:
