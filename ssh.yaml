@@ -1,0 +1,41 @@
+---
+#
+# Setup specific key for ssh cloud-user/root access
+#
+
+- name: Ping cluster
+  hosts: master, infra, compute[0:1]
+  gather_facts: false
+  vars_files:
+    - vars/install.yml
+    - vars/install.local.yml
+  tasks:
+    - name: Ensure .ssh directory exists for root
+      become: true
+      file:
+        path: /root/.ssh
+        state: directory
+
+    - name: Configure ssh keys
+      become: true
+      copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        mode: "{{item.mode}}"
+      with_items:
+        - src: "{{ssh_key_private}}"
+          dest: /root/.ssh/id_rsa
+          mode: "0600"
+        - src: "{{ssh_key_public}}"
+          dest: /root/.ssh/id_rsa.pub
+          mode: "0600"
+
+    - name: Configure ssh access
+      become: true
+      lineinfile:
+        path: "{{item}}"
+        line: "{{public_key_contents}}"
+        create: true
+      with_items:
+        - /home/cloud-user/.ssh/authorized_keys
+        - /root/.ssh/authorized_keys
