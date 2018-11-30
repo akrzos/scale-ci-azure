@@ -19,7 +19,11 @@ A copy is made of the `vars/install.yml` with the name `vars/install.local.yml` 
 ```
 [user@fedora scale-ci-azure]$ time ansible-playbook -i 'localhost,' inventory.yml -e 'rg=perf-test'
 ```
-4. Install tooling:
+4. Allow easy ssh access
+```
+[user@fedora scale-ci-azure]$ time ansible-playbook --forks 20 -i inventory ssh.yml
+```
+5. Install tooling:
 ```
 [user@fedora scale-ci-azure]$ time ansible-playbook --forks 20 -i inventory install.yml
 ```

@@ -4,6 +4,9 @@ ansible_private_key_file: ~/go/src/github.com/openshift/openshift-azure/_data/_o
 
 epel_rpm: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
+cluster_dns: perfdev.cloud
+rg: your_resource_group
+
 pbench_files:
   - src: files/pbench-agent-default.cfg
     dest: /opt/pbench-agent/config/pbench-agent-default.cfg

@@ -129,3 +129,32 @@
       become: true
       shell: bash /root/pbench-register.sh
       when: inventory_hostname == groups['master'][0]
+
+- name: Fix Cluster Router External IP
+  hosts: master, infra, compute
+  gather_facts: false
+  vars_files:
+    - vars/install.yml
+    - vars/install.local.yml
+  tasks:
+    - name: Get Cluster Router External IP
+      become: true
+      shell: oc get svc router -o yaml | grep ip | awk '{print $3}'
+      register: cluster_external_ip
+      when: inventory_hostname == groups['master'][0]
+
+    - name: Set global fact
+      set_fact:
+        cip: "{{hostvars[groups['master'][0]]['cluster_external_ip']['stdout']}}"
+
+    - name: Deploy /etc/dnsmasq.d/scale-ci.conf
+      become: true
+      copy:
+        content: "address=/{{rg}}.{{cluster_dns}}/{{cip}}"
+        dest: /etc/dnsmasq.d/scale-ci.conf
+
+    - name: Restart dnsmasq
+      become: true
+      systemd:
+        state: restarted
+        name: dnsmasq

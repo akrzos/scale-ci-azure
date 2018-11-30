@@ -3,7 +3,7 @@
 # Setup specific key for ssh cloud-user/root access
 #
 
-- name: Ping cluster
+- name: Allow ssh access to all nodes easily with same key
   hosts: master, infra, compute
   gather_facts: false
   vars_files:
