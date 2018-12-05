@@ -139,7 +139,7 @@
   tasks:
     - name: Get Cluster Router External IP
       become: true
-      shell: oc get svc router -o yaml | grep ip | awk '{print $3}'
+      shell: oc get svc router -o yaml -n default | grep ip | awk '{print $3}'
       register: cluster_external_ip
       when: inventory_hostname == groups['master'][0]
 
